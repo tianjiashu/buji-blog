@@ -1,0 +1,50 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getPublishedWorks, getStatusClass } from '@/lib/works';
+
+const works = getPublishedWorks(await getCollection('works'));
+---
+
+<BaseLayout title="作品" description="不急的作坊与积淀。利用业余时间雕琢的小玩意，不为流量，不求炫耀，在乎内心的安宁。">
+  <div class="animate-fade-in">
+
+    <section class="intro" aria-labelledby="works-title">
+      <h1 id="works-title" class="page-title">作坊与积淀 (Works)</h1>
+      <p class="lead">
+        这里记录了我利用业余时间雕琢的一些小玩意。不为流量，不求炫耀，只在乎在造物的过程中是否获得了内心的安宁。
+      </p>
+    </section>
+
+    {
+      works.length > 0 ? (
+        <div class="works-list">
+          {works.map((work) => (
+            <a href={`/works/${work.id}`} class="works-card">
+              <div class="works-card__header">
+                <div class="works-card__tags">
+                  {work.data.tags.map((tag: string) => (
+                    <span class="works-card__tag">{tag}</span>
+                  ))}
+                </div>
+                <span class={`works-card__status ${getStatusClass(work.data.status)}`}>
+                  {work.data.status}
+                </span>
+              </div>
+              <h2 class="works-card__title">{work.data.title}</h2>
+              <p class="works-card__excerpt">{work.data.description}</p>
+              <div class="works-card__cta">
+                <span>查看研习志 →</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p class="quiet-box">作坊中尚无公开作品，待匠人打磨完成。</p>
+      )
+    }
+
+    <p class="works-signoff">"以手作心，千锤百炼。"</p>
+
+  </div>
+</BaseLayout>

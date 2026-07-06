@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+/* ===== Tailwind Custom Theme ===== */
+@theme {
+  --font-serif: "Source Serif 4", "Noto Serif SC", Georgia, "Nimbus Roman No9 L", "Songti SC", "SimSun", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --color-buji-bg: #F5F0EB;
+  --color-buji-text: #2C2C2C;
+  --color-buji-accent: #B55A3C;
+  --color-buji-sub: #2F4F3F;
+  --color-buji-light: #F0EBE3;
+  --color-buji-muted: #8E877F;
+  --color-buji-border: #E6DFD5;
+}
+
+/* ===== Layered Imports ===== */
+@import "./base.css";
+@import "./layout.css";
+@import "./components.css";
+@import "./pages.css";

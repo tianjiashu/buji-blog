@@ -1,0 +1,56 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import CommentPlaceholder from '@/components/CommentPlaceholder.astro';
+import OldArticleNotice from '@/components/OldArticleNotice.astro';
+import PaginationNav from '@/components/PaginationNav.astro';
+import Prose from '@/components/Prose.astro';
+import type { BlogEntry } from '@/lib/content';
+import { formatDate, getReadingMinutes, getYearDistance } from '@/lib/content';
+
+interface Props {
+  article: BlogEntry;
+  previous?: BlogEntry;
+  next?: BlogEntry;
+}
+
+const { article, previous, next } = Astro.props;
+const readingMinutes = getReadingMinutes(article.body ?? '');
+const yearsOld = getYearDistance(article.data.date);
+---
+
+<BaseLayout title={article.data.title} description={article.data.description} canonicalPath={`/writing/${article.id}`}>
+  <article class="animate-fade-in">
+    <a class="back-link" href="/writing">← 返回随笔章节</a>
+
+    {yearsOld >= 1 && <OldArticleNotice years={yearsOld} updated={article.data.updated} />}
+
+    <header class="article-header">
+      <div class="article-header__meta">
+        <span class="article-header__category">{article.data.category}</span>
+        <span class="article-header__separator">·</span>
+        <time class="article-header__date" datetime={article.data.date.toISOString()}>{formatDate(article.data.date)}</time>
+      </div>
+      <h1 class="article-header__title">{article.data.title}</h1>
+      <div class="article-header__divider"></div>
+    </header>
+
+    <Prose>
+      <slot />
+    </Prose>
+
+    <div class="article-meta-footer">
+      <div>
+        <span>读完约需 {readingMinutes} 分钟 </span>
+        <span>· 字里行间，唯静能入</span>
+      </div>
+      <div class="article-meta-footer__tags">
+        <span class="article-meta-footer__tag">#{article.data.category}</span>
+        <span class="article-meta-footer__tag">#手艺人</span>
+      </div>
+    </div>
+
+    <PaginationNav previous={previous} next={next} />
+
+    <CommentPlaceholder itemSlug={article.id} />
+  </article>
+</BaseLayout>

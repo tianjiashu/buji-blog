@@ -1,0 +1,23 @@
+---
+import type { BlogEntry } from '@/lib/content';
+import { formatTimelineDate, getReadingMinutes } from '@/lib/content';
+
+interface Props {
+  article: BlogEntry;
+}
+
+const { article } = Astro.props;
+const readingMinutes = getReadingMinutes(article.body ?? '');
+---
+
+<article class="article-card" data-category={article.data.category}>
+  <div class="article-card__meta">
+    <span class="article-card__category">{article.data.category}</span>
+    <time datetime={article.data.date.toISOString()}>{formatTimelineDate(article.data.date)}</time>
+    <span class="article-card__read-time">· {readingMinutes} 分钟阅读</span>
+  </div>
+  <h2 class="article-card__title">
+    <a href={`/writing/${article.id}`}>{article.data.title}</a>
+  </h2>
+  <p class="article-card__description">{article.data.description}</p>
+</article>

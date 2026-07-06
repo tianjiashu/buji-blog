@@ -1,0 +1,39 @@
+---
+import type { BlogEntry } from '@/lib/content';
+
+interface Props {
+  previous?: BlogEntry;
+  next?: BlogEntry;
+}
+
+const { previous, next } = Astro.props;
+---
+
+<nav class="pagination-nav" aria-label="文章翻页">
+  {
+    previous ? (
+      <a href={`/writing/${previous.id}`}>
+        <small>上一章</small>
+        <span class="pagination-title">《{previous.data.title}》</span>
+      </a>
+    ) : (
+      <span class="pagination-empty">
+        <small>上一章</small>
+        这是第一章
+      </span>
+    )
+  }
+  {
+    next ? (
+      <a href={`/writing/${next.id}`}>
+        <small>下一章</small>
+        <span class="pagination-title">《{next.data.title}》</span>
+      </a>
+    ) : (
+      <span class="pagination-empty">
+        <small>下一章</small>
+        已是最新一章
+      </span>
+    )
+  }
+</nav>

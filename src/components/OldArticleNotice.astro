@@ -1,0 +1,14 @@
+---
+import { formatDate } from '@/lib/content';
+
+interface Props {
+  years: number;
+  updated?: Date;
+}
+
+const { years, updated } = Astro.props;
+---
+
+<aside class="notice" aria-label="旧文提示">
+  这篇写于 {years} 年前，但依然值得读。{updated ? `最后更新于 ${formatDate(updated)}。` : ''}
+</aside>

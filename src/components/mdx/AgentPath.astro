@@ -1,0 +1,81 @@
+﻿---
+interface Props {
+  steps: string[];
+}
+
+const { steps } = Astro.props;
+---
+
+<section class="agent-path" aria-label="用好 Agent 的实践路径">
+  <ol>
+    {steps.map((step, index) => (
+      <li>
+        <span class="agent-path__index">{String(index + 1).padStart(2, '0')}</span>
+        <span class="agent-path__name">{step}</span>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<style>
+  .agent-path {
+    margin-block: 2.75rem;
+    border-block: 1px dashed var(--color-buji-border);
+    padding-block: 24px;
+  }
+
+  .agent-path ol {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 760px) {
+    .agent-path ol {
+      grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+      gap: 10px;
+    }
+  }
+
+  .agent-path li {
+    position: relative;
+    min-height: 88px;
+    border: 1px solid var(--color-buji-border);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.32);
+    padding: 16px;
+  }
+
+  @media (min-width: 760px) {
+    .agent-path li:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: -11px;
+      width: 12px;
+      border-top: 1px dashed rgba(181, 90, 60, 0.45);
+    }
+  }
+
+  .agent-path__index {
+    display: block;
+    color: var(--color-buji-accent);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+  }
+
+  .agent-path__name {
+    display: block;
+    margin-top: 10px;
+    color: var(--color-buji-text);
+    font-family: var(--font-serif);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.45;
+  }
+</style>
+

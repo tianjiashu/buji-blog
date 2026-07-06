@@ -1,0 +1,96 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getPublishedWorks, getStatusClass } from '@/lib/works';
+
+export async function getStaticPaths() {
+  const works = getPublishedWorks(await getCollection('works'));
+
+  return works.map((work) => ({
+    params: { slug: work.id },
+    props: { work },
+  }));
+}
+
+const { work } = Astro.props;
+const { Content } = await render(work);
+---
+
+<BaseLayout title={work.data.title} description={work.data.description} canonicalPath={`/works/${work.id}`}>
+  <div class="animate-fade-in">
+
+    <a class="back-link" href="/works">← 返回作品列表</a>
+
+    <div class="works-detail">
+      <!-- Sidebar: Info Panel -->
+      <div class="works-detail__sidebar">
+        <span class="works-detail__label">作品志</span>
+        <h1>{work.data.title}</h1>
+
+        <dl class="works-detail__info">
+          <dt>当前进度状态:</dt>
+          <dd>
+            <span class={`works-card__status ${getStatusClass(work.data.status)}`}>
+              {work.data.status}
+            </span>
+          </dd>
+
+          {
+            work.data.tags.length > 0 && (
+              <>
+                <dt>工艺/媒介分类:</dt>
+                <dd>
+                  <div class="tag-row">
+                    {work.data.tags.map((tag: string) => (
+                      <span class="tag">{tag}</span>
+                    ))}
+                  </div>
+                </dd>
+              </>
+            )
+          }
+        </dl>
+
+        <div class="works-detail__actions">
+          {
+            work.data.docsUrl && (
+              <a
+                href={String(work.data.docsUrl)}
+                class="works-detail__action-btn works-detail__action-btn--primary"
+              >
+                阅读文档 →
+              </a>
+            )
+          }
+          {
+            work.data.githubUrl && (
+              <a
+                href={String(work.data.githubUrl)}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="works-detail__action-btn works-detail__action-btn--secondary"
+              >
+                GitHub 仓库
+              </a>
+            )
+          }
+        </div>
+      </div>
+
+      <!-- Body: Narrative content -->
+      <div class="works-detail__body">
+        <div class="works-detail__quote">
+          "{work.data.description}"
+        </div>
+        <div class="prose-buji">
+          <Content />
+        </div>
+      </div>
+    </div>
+
+    <div class="works-detail__footer">
+      <p>"造物即是与自我的静默对话。"</p>
+    </div>
+
+  </div>
+</BaseLayout>

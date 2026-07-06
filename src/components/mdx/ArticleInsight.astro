@@ -1,0 +1,63 @@
+﻿---
+interface Props {
+  label?: string;
+  title: string;
+}
+
+const { label = '核心判断', title } = Astro.props;
+---
+
+<aside class="article-insight" aria-label={label}>
+  <span class="article-insight__label">{label}</span>
+  <h2 class="article-insight__title">{title}</h2>
+  <div class="article-insight__body">
+    <slot />
+  </div>
+</aside>
+
+<style>
+  .article-insight {
+    border-block: 1px dashed var(--color-buji-border);
+    background: rgba(255, 255, 255, 0.35);
+    padding: 28px 0;
+  }
+
+  .article-insight__label {
+    display: block;
+    color: var(--color-buji-accent);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .article-insight__title {
+    margin: 10px 0 0;
+    color: var(--color-buji-text);
+    font-family: var(--font-serif);
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 1.45;
+    text-align: left;
+  }
+
+  .article-insight__body {
+    margin-top: 14px;
+    color: var(--color-buji-muted);
+    font-family: var(--font-serif);
+    font-size: 15px;
+    line-height: 1.85;
+  }
+
+  .article-insight__body :global(p) {
+    margin: 0;
+    color: var(--color-buji-muted);
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1.85;
+    text-align: left;
+  }
+</style>
+
+

@@ -1,0 +1,88 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { SITE } from '@/lib/site';
+---
+
+<BaseLayout title="关于" description={`关于《不急》和它的写作方向。${SITE.description}`}>
+  <div class="animate-fade-in">
+
+    <section class="intro" aria-labelledby="about-title">
+      <h1 id="about-title" class="page-title">关于手艺人与《不急》</h1>
+    </section>
+
+    <!-- Profile block: portrait + bio -->
+    <div class="about-profile">
+      <div class="about-portrait" aria-hidden="true">
+        <div class="about-portrait__inner">
+          <span class="about-portrait__icon">𓅪</span>
+          <span class="about-portrait__name">山林过客</span>
+          <span class="about-portrait__year">EST. 1996</span>
+        </div>
+      </div>
+      <div class="about-bio">
+        <h3>你好，我是这里的主人。</h3>
+        <p>
+          一个深居简出的技术工作者。在这个数字时代，我是代码的修剪师，也是喜欢在寂静深夜研读旧纸书的手艺人。
+        </p>
+        <p>
+          这个网站是我的自留地，也是我对抗数字焦虑的避难所。
+          在这里，我记录对编译原理、分布式系统等硬核技术的慢读体会，也记录在喧嚣生活中偶有所得的随笔碎片。
+        </p>
+      </div>
+    </div>
+
+    <!-- Concept quote -->
+    <div class="about-quote">
+      <p>“人生是长跑，不是冲刺。不慌不忙，才能看清路边的树木，与内心的微光。”</p>
+    </div>
+
+    <!-- Q & A -->
+    <section class="about-qa">
+      <h3>自问自答 (Q & A)</h3>
+
+      <div class="about-qa__item">
+        <p class="about-qa__q">
+          <span class="about-qa__q-mark">Q:</span>
+          为什么博客的名字叫《不急》？
+        </p>
+        <p class="about-qa__a">
+          因为我常感到焦虑。这个时代过载的信息流和无休止的"速成"叙事，让我们忘记了认知的生理极限。取名《不急》，是为了时刻警醒自己：真正的深度与质感，都是在漫长的摩挲中沉淀出来的。宁可慢一点，做扎实，也不要为了一时的虚荣或流量而消耗了造物的纯粹。
+        </p>
+      </div>
+
+      <div class="about-qa__item">
+        <p class="about-qa__q">
+          <span class="about-qa__q-mark">Q:</span>
+          那么，你是如何践行「慢」的？
+        </p>
+        <p class="about-qa__a">
+          不追逐每个新生的库，而是去研习支撑它们运转的底层计算机理论；不把时间花在碎片化的快餐信息上，而是关掉电子设备，完整地读完一本书；在写一篇文章、设计一个作品时，不设截止日期，不为 SEO 优化，只求一字一句、一砖一瓦里，有对细节的打磨。
+        </p>
+      </div>
+
+      <div class="about-qa__item">
+        <p class="about-qa__q">
+          <span class="about-qa__q-mark">Q:</span>
+          不提供暗色模式、不加侧边栏和丰富功能，不会降低用户体验吗？
+        </p>
+        <p class="about-qa__a">
+          体验有很多种。在繁华街区闪烁的霓虹灯是一种体验，而在安静的书室里点燃一炷香、翻动几张泛黄的书页也是一种体验。我希望提供的是后者。那些不断闪烁的按钮、繁杂的侧边挂件、高对比度的亮色设计，都会在无形中增加大脑的运算负担。在这里，我们做减法，让内容成为唯一的发声体。
+        </p>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="about-contact">
+      <h3>寻迹与投书 (Contact)</h3>
+      <p>
+        如果你在某些深夜读到这些字句并有所共鸣，随时欢迎致信。慢读慢回，不急。
+      </p>
+      <div class="about-contact__links">
+        <a href={`mailto:${SITE.email}`}>邮箱: {SITE.email}</a>
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">Twitter / X</a>
+      </div>
+    </section>
+
+  </div>
+</BaseLayout>

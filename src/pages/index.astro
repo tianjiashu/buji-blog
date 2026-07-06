@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import ArticleCard from '@/components/ArticleCard.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getPublishedBlog } from '@/lib/content';
+
+const articles = getPublishedBlog(await getCollection('blog')).slice(0, 3);
+---
+
+<BaseLayout>
+  <section class="intro animate-fade-in" aria-labelledby="home-title">
+    <h1 id="home-title" class="page-title">做一个减速的人</h1>
+    <p class="lead">
+      「在这个快节奏、浮躁的时代，我们试图通过文字与代码，专注长期的积累。我们相信慢就是快，相信人生的质量，往往取决于那些不慌不忙的时刻。」
+    </p>
+  </section>
+
+  {
+    articles.length > 0 && (
+      <section aria-labelledby="latest-title" class="animate-fade-in">
+        <div class="timeline-heading">
+          <h2 id="latest-title">最新随笔 (Timeline)</h2>
+          <a href="/writing">查看全部章节 →</a>
+        </div>
+        <div class="article-list">
+          {articles.map((article) => <ArticleCard article={article} />)}
+        </div>
+      </section>
+    )
+  }
+
+  <aside class="quiet-quote animate-fade-in" aria-label="安静引用">
+    <p>“要像树木一样，不催促自己的生长。树木静立于风暴中，相信夏日终将到来，而无须提前索取它的许诺。”</p>
+    <span>— 里尔克 《给青年诗人的信》</span>
+  </aside>
+</BaseLayout>

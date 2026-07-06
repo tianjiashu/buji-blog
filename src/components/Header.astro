@@ -1,0 +1,46 @@
+---
+interface Props {
+  currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+
+const isWriting = currentPath.startsWith('/writing');
+const isWorks = currentPath.startsWith('/works');
+const isAbout = currentPath.startsWith('/about');
+---
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <div class="site-brand">
+      <a
+        class="site-title"
+        href="/"
+        aria-label="不急首页"
+        id="site-logo"
+      >
+        《不急》
+      </a>
+      <span class="site-slogan" id="site-slogan">人生是长跑，不是冲刺。</span>
+    </div>
+    <nav class="site-nav" aria-label="主导航">
+      <a href="/writing" aria-current={isWriting ? 'page' : undefined}>随笔</a>
+      <a href="/works" aria-current={isWorks ? 'page' : undefined}>作品</a>
+      <a href="/about" aria-current={isAbout ? 'page' : undefined}>关于</a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const logo = document.getElementById('site-logo');
+  const slogan = document.getElementById('site-slogan');
+
+  if (logo && slogan) {
+    logo.addEventListener('mouseenter', () => {
+      slogan.classList.add('is-visible');
+    });
+    logo.addEventListener('mouseleave', () => {
+      slogan.classList.remove('is-visible');
+    });
+  }
+</script>

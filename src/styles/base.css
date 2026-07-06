@@ -1,0 +1,138 @@
+/* ===== Resets & Base ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color: var(--color-buji-text);
+  background: var(--color-buji-bg);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  background: var(--color-buji-bg);
+  color: var(--color-buji-text);
+  font-family: var(--font-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Paper-grade grid texture overlay */
+body::before {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+  background-image:
+    linear-gradient(rgba(44, 44, 44, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(44, 44, 44, 0.018) 1px, transparent 1px);
+  background-size: 32px 32px, 32px 32px;
+}
+
+/* Selection highlight — soft terracotta tint */
+::selection {
+  background: rgba(181, 90, 60, 0.16);
+  color: var(--color-buji-text);
+}
+
+/* Global smooth transitions for color/bg/border changes */
+* {
+  transition-property: color, background-color, border-color;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Fine-styled paper-grade scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-buji-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-buji-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-buji-accent);
+}
+
+/* ===== Links ===== */
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  color: var(--color-buji-accent);
+}
+
+/* ===== Focus ===== */
+:focus-visible {
+  outline: 2px solid var(--color-buji-accent);
+  outline-offset: 4px;
+}
+
+/* ===== Skip Link (a11y) ===== */
+.skip-link {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
+  transform: translateY(-160%);
+  border: 1px solid var(--color-buji-border);
+  background: var(--color-buji-light);
+  padding: 8px 12px;
+  font-family: var(--font-serif);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* ===== Shared Badge/Tag Pill (base class) ===== */
+.badge-pill {
+  border-radius: 2px;
+  padding: 2px 8px;
+  font-family: var(--font-serif);
+  font-size: 11px;
+}
+
+/* ===== Animations ===== */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 600ms cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+/* ===== Reduced Motion ===== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

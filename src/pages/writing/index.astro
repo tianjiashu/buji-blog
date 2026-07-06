@@ -1,0 +1,85 @@
+---
+import { getCollection } from 'astro:content';
+import ArticleCard from '@/components/ArticleCard.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { BLOG_CATEGORIES, getPublishedBlog } from '@/lib/content';
+
+const articles = getPublishedBlog(await getCollection('blog'));
+const selectedCategory = Astro.url.searchParams.get('category') || '全部';
+const EMPTY_TEXT = '这个分类暂时还没有公开文章。';
+---
+
+<BaseLayout title="随笔" description="《不急》的随笔目录，记录技术、节奏和长期主义。">
+  <section class="intro animate-fade-in" aria-labelledby="writing-title">
+    <div class="timeline-heading">
+      <h2 id="writing-title" class="page-title" style="text-transform: none; color: var(--color-buji-text); font-size: 24px; letter-spacing: 0.04em; font-weight: 700;">随笔章节</h2>
+    </div>
+    <nav class="category-filter" aria-label="文章分类">
+      {
+        BLOG_CATEGORIES.map((category) => (
+          <a
+            href={category === '全部' ? '/writing' : `/writing?category=${encodeURIComponent(category)}`}
+            data-category-filter={category}
+            aria-current={category === selectedCategory ? 'page' : undefined}
+          >
+            {category}
+          </a>
+        ))
+      }
+    </nav>
+  </section>
+
+  {
+    articles.length > 0 ? (
+      <div class="article-list animate-fade-in">
+        {articles.map((article) => <ArticleCard article={article} />)}
+      </div>
+    ) : (
+      <p class="quiet-box">{EMPTY_TEXT}</p>
+    )
+  }
+  <p class="quiet-box" data-empty-category hidden>{EMPTY_TEXT}</p>
+
+  {
+    articles.length > 0 && (
+      <div class="writing-signoff animate-fade-in">
+        <span class="writing-signoff__line"></span>
+        <span class="writing-signoff__text">终章 / 慢即是快</span>
+        <span class="writing-signoff__line"></span>
+      </div>
+    )
+  }
+
+  <script>
+    const filters = Array.from(document.querySelectorAll('[data-category-filter]'));
+    const articleCards = Array.from(document.querySelectorAll('[data-category]'));
+    const emptyState = document.querySelector('[data-empty-category]');
+
+    function applyCategoryFromUrl() {
+      const requested = new URLSearchParams(window.location.search).get('category') || '全部';
+      const categories = new Set(filters.map((f) => f.getAttribute('data-category-filter')));
+      const activeCategory = categories.has(requested) ? requested : '全部';
+      let visibleCount = 0;
+
+      for (const article of articleCards) {
+        const shouldShow =
+          activeCategory === '全部' || article.getAttribute('data-category') === activeCategory;
+        article.toggleAttribute('hidden', !shouldShow);
+        if (shouldShow) visibleCount += 1;
+      }
+
+      for (const filter of filters) {
+        if (filter.getAttribute('data-category-filter') === activeCategory) {
+          filter.setAttribute('aria-current', 'page');
+        } else {
+          filter.removeAttribute('aria-current');
+        }
+      }
+
+      emptyState?.toggleAttribute('hidden', visibleCount > 0);
+    }
+
+    applyCategoryFromUrl();
+    window.addEventListener('popstate', applyCategoryFromUrl);
+  </script>
+</BaseLayout>

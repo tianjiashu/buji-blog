@@ -1,0 +1,82 @@
+﻿---
+interface CompareItem {
+  title: string;
+  items: string[];
+}
+
+interface Props {
+  left: CompareItem;
+  right: CompareItem;
+}
+
+const { left, right } = Astro.props;
+---
+
+<section class="agent-compare" aria-label="使用 Agent 和用好 Agent 的区别">
+  <article class="agent-compare__panel">
+    <h2>{left.title}</h2>
+    <ul>
+      {left.items.map((item) => <li>{item}</li>)}
+    </ul>
+  </article>
+  <article class="agent-compare__panel agent-compare__panel--strong">
+    <h2>{right.title}</h2>
+    <ul>
+      {right.items.map((item) => <li>{item}</li>)}
+    </ul>
+  </article>
+</section>
+
+<style>
+  .agent-compare {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-block: 2.5rem;
+  }
+
+  @media (min-width: 720px) {
+    .agent-compare {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .agent-compare__panel {
+    border: 1px solid var(--color-buji-border);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.35);
+    padding: 22px;
+  }
+
+  .agent-compare__panel--strong {
+    border-color: rgba(181, 90, 60, 0.32);
+    background: rgba(181, 90, 60, 0.055);
+  }
+
+  .agent-compare__panel h2 {
+    margin: 0 0 14px;
+    color: var(--color-buji-text);
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.35;
+    text-align: left;
+  }
+
+  .agent-compare__panel ul {
+    margin: 0;
+    padding-left: 1.15rem;
+    color: var(--color-buji-muted);
+    font-family: var(--font-serif);
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .agent-compare__panel li {
+    margin: 0 0 8px;
+  }
+
+  .agent-compare__panel li:last-child {
+    margin-bottom: 0;
+  }
+</style>
