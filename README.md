@@ -53,7 +53,11 @@ Output directory: dist
 
 ```text
 SITE_URL=https://你的正式域名
+UPSTASH_REDIS_REST_URL=你的 Upstash Redis REST URL
+UPSTASH_REDIS_REST_TOKEN=你的 Upstash Redis REST Token
 ```
+
+匿名留言板通过 Vercel Functions 写入 Upstash Redis。未配置 Redis 环境变量时，文章页会保留留言入口但不接受写入。
 
 本地部署前检查：
 

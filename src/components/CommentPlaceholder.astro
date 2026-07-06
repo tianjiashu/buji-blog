@@ -2,18 +2,42 @@
 interface Props {
   itemSlug: string;
 }
+
+const { itemSlug } = Astro.props;
 ---
 
-<section class="comment-placeholder" aria-labelledby="comments-title">
+<section class="comment-board" aria-labelledby="comments-title" data-article-slug={itemSlug}>
   <h2 id="comments-title">🍂 共鸣与讨论</h2>
   <p>
     匿名留言板。在这里，你可以留下对这篇文章的感悟与思考。
     不急，慢慢组织语言。千江有水千江月，期待你的静心留言。
   </p>
-  <p class="muted" style="margin-top: 12px; font-size: 12px;">
-    留言功能正在搭建中。届时将支持免登录匿名留言与「共鸣」互动。
-    在等待墨迹干透的时光里，如果文中有触动你的地方，欢迎通过
-    <a href="/about" style="text-decoration: underline; text-underline-offset: 3px;">联系页面</a>
-    给博主投递一封私信。
-  </p>
+
+  <form class="comment-form" data-comment-form>
+    <div class="comment-form__grid">
+      <label>
+        <span>署名</span>
+        <input name="authorName" maxlength="24" autocomplete="nickname" placeholder="匿名读者" />
+      </label>
+      <label class="comment-form__trap">
+        <span>网址</span>
+        <input name="trap" tabindex="-1" autocomplete="off" />
+      </label>
+    </div>
+    <label>
+      <span>留言</span>
+      <textarea name="content" minlength="2" maxlength="600" required rows="5" placeholder="写下你停留在这里的理由。"></textarea>
+    </label>
+    <div class="comment-form__footer">
+      <span data-comment-count>0 / 600</span>
+      <button type="submit">寄出留言</button>
+    </div>
+    <p class="comment-board__status" data-comment-status aria-live="polite"></p>
+  </form>
+
+  <div class="comment-list" data-comment-list aria-live="polite"></div>
 </section>
+
+<script>
+  import '@/scripts/comment-board';
+</script>

@@ -1,4 +1,6 @@
 ---
+import { SITE } from '@/lib/site';
+
 const year = new Date().getFullYear();
 ---
 
@@ -9,7 +11,7 @@ const year = new Date().getFullYear();
       <span class="site-footer__motto">以字为凭，静待风来。</span>
     </div>
     <nav aria-label="页脚导航">
-      <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href={SITE.githubUrl} target="_blank" rel="noopener noreferrer">GitHub</a>
       <a href="/rss.xml">RSS 订阅</a>
     </nav>
   </div>
