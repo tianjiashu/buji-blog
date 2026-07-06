@@ -53,11 +53,14 @@ Output directory: dist
 
 ```text
 SITE_URL=https://你的正式域名
-UPSTASH_REDIS_REST_URL=你的 Upstash Redis REST URL
-UPSTASH_REDIS_REST_TOKEN=你的 Upstash Redis REST Token
+GITHUB_COMMENTS_OWNER=你的 GitHub 用户名或组织名
+GITHUB_COMMENTS_REPO=用于存放留言 Issue 的仓库名
+GITHUB_COMMENTS_TOKEN=具备目标仓库 Issues Read and write 权限的 fine-grained token
 ```
 
-匿名留言板通过 Vercel Functions 写入 Upstash Redis。未配置 Redis 环境变量时，文章页会保留留言入口但不接受写入。
+匿名留言板通过 Vercel Functions 写入 GitHub Issues。未配置 GitHub 留言环境变量时，文章页会保留留言入口但不接受写入。
+
+留言的“共鸣”计数存放在 GitHub comment body metadata 中，适合低频博客互动；GitHub Issues 不提供自定义计数器的原子递增能力，高并发同时点击时计数可能出现轻微丢增量。
 
 本地部署前检查：
 

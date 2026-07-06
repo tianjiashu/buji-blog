@@ -1,101 +1,118 @@
-import { Redis } from '@upstash/redis';
+import {
+  createIssue,
+  createIssueComment,
+  GITHUB_PAGE_SIZE,
+  getIssueComment,
+  listIssueComments,
+  searchIssuesByTitle,
+  updateIssueComment,
+} from './github-api.js';
+import type { GitHubCommentsConfig } from './github-config.js';
+import { formatCommentBody, parseCommentBody } from './github-comment-body.js';
+import { PublicApiError } from './errors.js';
 import type { PublicMessage, StoredMessage } from './types.js';
 import type { ValidMessageInput } from './validation.js';
 
-const MESSAGE_INDEX_PREFIX = 'buji:messages';
-const MESSAGE_RECORD_PREFIX = 'buji:message';
-const MESSAGE_RESONANCE_PREFIX = 'buji:message-resonance';
-const MAX_MESSAGES_PER_ARTICLE = 80;
+const ISSUE_TITLE_PREFIX = '[comments]';
+const MAX_COMMENT_SCAN_PAGES = 20;
 
-let cachedRedis: Redis | null | undefined;
-
-export function getRedisClient(): Redis | null {
-  if (cachedRedis !== undefined) {
-    return cachedRedis;
-  }
-
-  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
-    cachedRedis = null;
-    return cachedRedis;
-  }
-
-  cachedRedis = Redis.fromEnv();
-  return cachedRedis;
-}
-
-export async function listMessages(redis: Redis, articleSlug: string): Promise<PublicMessage[]> {
-  const ids = await redis.zrange<string[]>(messageIndexKey(articleSlug), 0, MAX_MESSAGES_PER_ARTICLE - 1, {
-    rev: true,
-  });
-
-  if (ids.length === 0) {
+export async function listMessages(config: GitHubCommentsConfig, articleSlug: string): Promise<PublicMessage[]> {
+  const issue = await findIssueByArticleSlug(config, articleSlug);
+  if (!issue) {
     return [];
   }
 
-  const records = await redis.mget<(StoredMessage | string | null)[]>(...ids.map(messageRecordKey));
-  const counts = await redis.mget<(number | string | null)[]>(...ids.map(messageResonanceKey));
-
-  return records
-    .map((record, index) => toPublicMessage(record, counts[index]))
-    .filter((message): message is PublicMessage => message !== null);
+  const comments = await listAllIssueComments(config, issue.number);
+  return comments
+    .map((comment) => parseCommentBody(comment.id, comment.body))
+    .filter((message): message is StoredMessage => message?.articleSlug === articleSlug)
+    .map(toPublicMessage)
+    .reverse();
 }
 
-export async function createMessage(redis: Redis, input: ValidMessageInput): Promise<PublicMessage> {
+export async function createMessage(
+  config: GitHubCommentsConfig,
+  input: ValidMessageInput,
+): Promise<PublicMessage> {
+  const issue = await findOrCreateArticleIssue(config, input.articleSlug);
   const createdAt = new Date().toISOString();
-  const message: StoredMessage = {
-    id: crypto.randomUUID(),
+  const draft: StoredMessage = {
+    id: 'pending',
     articleSlug: input.articleSlug,
     authorName: input.authorName,
     content: input.content,
     createdAt,
-  };
-
-  await redis.set(messageRecordKey(message.id), message);
-  await redis.zadd(messageIndexKey(message.articleSlug), {
-    score: Date.parse(createdAt),
-    member: message.id,
-  });
-  await redis.zremrangebyrank(messageIndexKey(message.articleSlug), 0, -MAX_MESSAGES_PER_ARTICLE - 1);
-
-  return {
-    ...message,
     resonanceCount: 0,
   };
+
+  const comment = await createIssueComment(config, issue.number, formatCommentBody(draft));
+  return toPublicMessage({
+    ...draft,
+    id: String(comment.id),
+    createdAt: comment.created_at || draft.createdAt,
+  });
 }
 
-export async function incrementResonance(redis: Redis, messageId: string): Promise<number> {
-  return redis.incr(messageResonanceKey(messageId));
-}
-
-function toPublicMessage(record: StoredMessage | string | null, count: number | string | null): PublicMessage | null {
-  const message = typeof record === 'string' ? parseStoredMessage(record) : record;
+export async function incrementResonance(config: GitHubCommentsConfig, messageId: string): Promise<number> {
+  const comment = await getIssueComment(config, messageId);
+  const message = parseCommentBody(comment.id, comment.body);
 
   if (!message) {
-    return null;
+    throw new PublicApiError('留言不存在。', 404);
   }
 
-  return {
+  const updated: StoredMessage = {
     ...message,
-    resonanceCount: Number(count ?? 0),
+    resonanceCount: message.resonanceCount + 1,
+  };
+  // GitHub Issues comments do not support atomic custom counters; this is best-effort for low-volume blog interactions.
+  const saved = await updateIssueComment(config, messageId, formatCommentBody(updated));
+  const savedMessage = parseCommentBody(saved.id, saved.body);
+
+  return savedMessage?.resonanceCount ?? updated.resonanceCount;
+}
+
+async function findOrCreateArticleIssue(config: GitHubCommentsConfig, articleSlug: string) {
+  const issue = await findIssueByArticleSlug(config, articleSlug);
+  if (issue) {
+    return issue;
+  }
+
+  return createIssue(config, issueTitle(articleSlug), `Comments for \`${articleSlug}\`.`);
+}
+
+async function findIssueByArticleSlug(config: GitHubCommentsConfig, articleSlug: string) {
+  const title = issueTitle(articleSlug);
+  const issues = await searchIssuesByTitle(config, title);
+  return issues.find((candidate) => candidate.title === title && !candidate.pull_request) ?? null;
+}
+
+async function listAllIssueComments(config: GitHubCommentsConfig, issueNumber: number) {
+  const comments: Awaited<ReturnType<typeof listIssueComments>> = [];
+
+  for (let page = 1; page <= MAX_COMMENT_SCAN_PAGES; page += 1) {
+    const pageComments = await listIssueComments(config, issueNumber, page);
+    comments.push(...pageComments);
+
+    if (pageComments.length < GITHUB_PAGE_SIZE) {
+      return comments;
+    }
+  }
+
+  return comments;
+}
+
+function toPublicMessage(message: StoredMessage): PublicMessage {
+  return {
+    id: message.id,
+    articleSlug: message.articleSlug,
+    authorName: message.authorName,
+    content: message.content,
+    createdAt: message.createdAt,
+    resonanceCount: message.resonanceCount,
   };
 }
 
-function parseStoredMessage(value: string): StoredMessage | null {
-  try {
-    return JSON.parse(value) as StoredMessage;
-  } catch {
-    return null;
-  }
-}
-
-function messageIndexKey(articleSlug: string): string {
-  return `${MESSAGE_INDEX_PREFIX}:${articleSlug}`;
-}
-
-function messageRecordKey(messageId: string): string {
-  return `${MESSAGE_RECORD_PREFIX}:${messageId}`;
-}
-
-function messageResonanceKey(messageId: string): string {
-  return `${MESSAGE_RESONANCE_PREFIX}:${messageId}`;
+function issueTitle(articleSlug: string): string {
+  return `${ISSUE_TITLE_PREFIX} ${articleSlug}`;
 }

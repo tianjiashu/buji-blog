@@ -44,7 +44,7 @@ export function validateCreateMessage(input: CreateMessageInput): ValidMessageIn
 }
 
 export function validateResonanceInput(input: { messageId?: unknown }): ResonanceInput {
-  if (typeof input.messageId !== 'string' || !/^[0-9a-f-]{36}$/i.test(input.messageId)) {
+  if (typeof input.messageId !== 'string' || !/^\d+$/.test(input.messageId)) {
     throw new PublicApiError('留言标识无效。');
   }
 

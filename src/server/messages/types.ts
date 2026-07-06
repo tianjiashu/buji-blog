@@ -13,6 +13,7 @@ export interface StoredMessage {
   authorName: string;
   content: string;
   createdAt: string;
+  resonanceCount: number;
 }
 
 export interface CreateMessageInput {
