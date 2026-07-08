@@ -1,0 +1,86 @@
+---
+interface Props {
+  src?: string;
+  alt: string;
+  caption?: string;
+  tone?: 'image' | 'meme';
+  aspectRatio?: string;
+}
+
+const { src, alt, caption, tone = 'meme', aspectRatio = '16 / 9' } = Astro.props;
+const label = tone === 'meme' ? '表情包位' : '配图位';
+---
+
+<figure class:list={['blog-meme', `blog-meme--${tone}`]} style={`--blog-meme-ratio: ${aspectRatio};`}>
+  <div class="blog-meme__media">
+    {src ? (
+      <img src={src} alt={alt} loading="lazy" decoding="async" />
+    ) : (
+      <div class="blog-meme__placeholder" role="img" aria-label={alt}>
+        <span>{label}</span>
+        <strong>{alt}</strong>
+      </div>
+    )}
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .blog-meme {
+    margin-block: 2.5rem;
+  }
+
+  .blog-meme__media {
+    display: grid;
+    width: 100%;
+    aspect-ratio: var(--blog-meme-ratio);
+    overflow: hidden;
+    border: 1px solid var(--color-buji-border);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.38);
+  }
+
+  .blog-meme img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .blog-meme__placeholder {
+    display: grid;
+    place-items: center;
+    padding: 32px;
+    text-align: center;
+  }
+
+  .blog-meme__placeholder span {
+    color: var(--color-buji-accent);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+  }
+
+  .blog-meme__placeholder strong {
+    max-width: 28rem;
+    color: var(--color-buji-text);
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.55;
+  }
+
+  .blog-meme--meme .blog-meme__media {
+    background:
+      linear-gradient(135deg, rgba(181, 90, 60, 0.08), transparent 46%),
+      rgba(255, 255, 255, 0.42);
+  }
+
+  .blog-meme figcaption {
+    margin-top: 10px;
+    color: var(--color-buji-muted);
+    font-family: var(--font-serif);
+    font-size: 13px;
+    line-height: 1.75;
+    text-align: center;
+  }
+</style>
